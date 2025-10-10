@@ -1,0 +1,215 @@
+Replit Prompt — KI Second Opinion Dental (Full Product, Prisma + Ollama)
+Ziele
+Baue eine produktionsreife, datenschutzfreundliche Web-Plattform für zahnärztliche Zweitmeinungen mit:
+Automatischer KI-Analyse (Röntgen/OPT/DVT/CBCT + Offerten/Briefe),
+Ärztlichem Review (optional, abrechenbar),
+Lead-Routing zu Partnerpraxen (Roaadent-kompatibel),
+Monetarisierung über Stripe (Report + Review + Leads),
+Speicherung ausschließlich in MinIO (S3-kompatibel).
+Tech-Stack & Struktur
+Frontend: React + Vite, TypeScript, Zustand/Redux, React-Router, CornerstoneJS für DICOM/OPT-Viewer.
+Backend API: Node.js (Fastify oder Express), Prisma ORM (PostgreSQL), JWT-Auth, Stripe, MinIO (S3).
+KI-Service: Python FastAPI, Anbindung an Ollama (lokale Modelle), HTTP JSON API.
+Storage: MinIO (S3-kompatibel), keine lokalen Files.
+Async: In-Process Queue (BullMQ/Redis) ODER Job-Tabelle + Worker.
+Infra: .env-basierte Konfiguration, Nix/Procfile, seed-Skripte.
+Repository-Layout
+/frontend        # React + Vite
+/backend         # Node API (Fastify/Express) + Prisma + Workers
+/ml              # FastAPI KI-Service (Ollama-Bridge)
+/infra           # MinIO/DB/Seed/Docs
+ENV-Variablen (alle zwingend)
+# Backend
+DATABASE_URL=postgresql://user:pass@host:5432/secondopinion
+JWT_SECRET=change_me
+STRIPE_SECRET=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+MINIO_ENDPOINT=http://localhost:9000
+MINIO_ACCESS_KEY=minio
+MINIO_SECRET_KEY=miniosecret
+MINIO_BUCKET=secondopinion
+MINIO_REGION=us-east-1
+S3_FORCE_PATH_STYLE=true
+
+# KI-Service
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODELS=llama3.2-vision:Q5,mistral-nemo:Q4
+RAG_ENABLE=false
+Datenmodell (Prisma schema.prisma)
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+enum Role { PATIENT DENTIST ADMIN }
+enum CaseStatus { DRAFT QUEUED AI_DONE DOCTOR_ASSIGNED CLOSED }
+enum FileKind { RX OPT DVT CBCT OFFER OTHER }
+enum ReviewStatus { REQUESTED IN_PROGRESS COMPLETED REJECTED }
+enum PaymentType { AI REVIEW LEAD }
+enum PaymentStatus { INIT REQUIRES_ACTION PAID FAILED REFUNDED }
+enum LeadStatus { CREATED SENT ACCEPTED DECLINED PAID }
+
+model User {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  password  String
+  role      Role    @default(PATIENT)
+  createdAt DateTime @default(now())
+  cases     Case[]
+  reviews   HumanReview[] @relation("DentistReviews")
+}
+
+model Case {
+  id         String      @id @default(cuid())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  status     CaseStatus  @default(DRAFT)
+  symptoms   String?
+  createdAt  DateTime    @default(now())
+  files      File[]
+  aiReport   AIReport?
+  reviews    HumanReview[]
+  payments   Payment[]
+  leads      Lead[]
+}
+
+model File {
+  id        String   @id @default(cuid())
+  case      Case     @relation(fields: [caseId], references: [id])
+  caseId    String
+  kind      FileKind
+  s3Key     String
+  mime      String
+  size      Int
+  createdAt DateTime  @default(now())
+}
+
+model AIReport {
+  id         String   @id @default(cuid())
+  case       Case     @relation(fields: [caseId], references: [id])
+  caseId     String   @unique
+  summary    String
+  findings   Json
+  confidence Float
+  pdfS3Key   String
+  createdAt  DateTime @default(now())
+}
+
+model HumanReview {
+  id           String       @id @default(cuid())
+  case         Case         @relation(fields: [caseId], references: [id])
+  caseId       String
+  dentist      User         @relation("DentistReviews", fields: [dentistId], references: [id])
+  dentistId    String
+  notes        String?
+  status       ReviewStatus @default(REQUESTED)
+  signedPdfKey String?
+  createdAt    DateTime     @default(now())
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  case        Case          @relation(fields: [caseId], references: [id])
+  caseId      String
+  type        PaymentType
+  amount      Int
+  status      PaymentStatus @default(INIT)
+  stripeSess  String?
+  createdAt   DateTime      @default(now())
+}
+
+model Practice {
+  id        String  @id @default(cuid())
+  name      String
+  city      String?
+  country   String?
+  roaadentOrgId String?
+  leadFee   Int      @default(0)
+  leads     Lead[]
+}
+
+model Lead {
+  id         String     @id @default(cuid())
+  case       Case       @relation(fields: [caseId], references: [id])
+  caseId     String
+  practice   Practice   @relation(fields: [practiceId], references: [id])
+  practiceId String
+  status     LeadStatus @default(CREATED)
+  payoutCents Int       @default(0)
+  createdAt  DateTime   @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+Backend — REST API (OpenAPI-like Spezifikation)
+Auth
+POST /v1/auth/signup {email, password, role} → 201
+POST /v1/auth/signin {email, password} → {token}
+GET /v1/auth/me (Bearer) → User
+Cases & Files
+POST /v1/cases → {id}
+GET /v1/cases/:id
+POST /v1/cases/:id/files/presign {kind, mime, size} → {url, fields?, key}
+POST /v1/cases/:id/submit → enqueued KI-Job (ml-Service)
+AI
+POST /v1/cases/:id/ai/trigger → 202
+GET /v1/cases/:id/ai/report → {summary, findings, confidence, pdfUrl}
+Reviews
+POST /v1/cases/:id/review/request → Stripe Session (type=REVIEW)
+POST /v1/reviews/:id/complete (Dentist) {notes, signedPdfKey} → 200
+Payments
+POST /v1/payments/checkout {caseId, type} → {stripeUrl}
+POST /v1/payments/webhook (Stripe) → status sync
+Leads / Practices
+GET /v1/practices/search?near=…&service=…
+POST /v1/leads/route {caseId} → matched practice
+POST /v1/leads/:id/status {status}
+Admin
+GET /v1/admin/cases?status=…
+GET /v1/admin/audit
+MinIO (S3) – Vorgaben
+Direkte presigned PUT Uploads vom Frontend; nur presigned GET zum Abruf.
+Buckets: raw-uploads/, processed/, reports/, audit/.
+Aktivierte Server-Side Encryption (falls verfügbar), kurze URL-Ablaufzeit.
+KI-Service (FastAPI, ml/)
+Endpoints
+POST /vision/analyze → {files_s3_keys[], symptoms} ⇒ {findings, confidence}
+POST /text/parse-offer → {pdf_s3_key} ⇒ {items[], totals, flags[]}
+POST /report/compose → {caseId, findings, offer?} ⇒ {summary, pdf_s3_key}
+Ollama
+Verbinde via POST {OLLAMA_HOST}/api/generate oder /api/chat je nach Modell.
+Modelle per ENV (OLLAMA_MODELS) + Auto-Fallback (Vision → Text).
+Guardrails: Keine Therapieanweisungen; nur Informationszwecke; Unsicherheitsgrad ausgeben.
+Frontend – Kernseiten & Komponenten
+Onboarding/Upload: Wizard (Symptome → Upload → Zahlung → Ergebnis)
+OPT/DICOM-Viewer: CornerstoneJS (Pan/Zoom/WW/WL), Overlay Heatmap
+Report-Viewer: Laien-/Fachansicht, Download PDF
+Checkout (Stripe), Status-Tracking (Polling/WebSocket)
+Dentist Dashboard: Fallliste, Viewer, Notizen, Signieren
+Admin Konsole: Suche, Refund, Abuse-Flags
+Sicherheit & Recht
+Rollen: PATIENT/DENTIST/ADMIN (RBAC), Endpunkt-Guards.
+DSGVO: Export/Löschung, AuditLog, Einwilligungstexte.
+Disclaimer: Im UI + PDF („kein Ersatz einer klinischen Untersuchung“).
+Akzeptanzkriterien (Definition of Done)
+Upload-Flow schreibt Dateien nach MinIO via presigned PUT, nie lokal.
+Analyse-Flow: API triggert KI-Service; Findings + PDF-Report werden gespeichert.
+Stripe Checkout funktioniert (Test-Keys), Webhook aktualisiert Payment-Status.
+Dentist-Review erzeugt signiertes PDF (Key in reports/).
+Lead-Routing erstellt Lead und weist Practice zu.
+Prisma Migrations & Seed laufen; pnpm prisma migrate dev erfolgreich.
+End-to-End Demo: Neuer Patient → Upload → Zahlung → Report → Review → Lead.
+Developer-Skripte
+Root README.md mit Setup.
+make dev: startet Frontend/Backend/ML/MinIO (oder Dokus, wie lokal zu starten).
+backend: pnpm dev, pnpm prisma migrate dev, pnpm seed.
+ml: uvicorn app:app --reload.
+Seeds: Testnutzer (Patient/Dentist/Admin), 1–2 Beispielcases mit Dummy-OPT.
+Bonus (nice to have)
+WebSocket/SSE für Job-Status.
+ClamAV-Hook nach Upload.
+RAG-FAQ mit abschaltbarer Zitierung.
+WICHTIG: Keine Beispiel-Dateien im Repo speichern; Tests nutzen generierte Dummys. Alle Binärdaten ausschließlich in MinIO.
