@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import PatientDashboard from "@/pages/patient-dashboard";
 import UploadWizard from "@/pages/upload-wizard";
+import CaseDetail from "@/pages/case-detail";
 import DentistDashboard from "@/pages/dentist-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 
@@ -50,6 +51,7 @@ function Router() {
               <Route path="/" component={PatientDashboard} />
               <Route path="/dashboard" component={PatientDashboard} />
               <Route path="/upload" component={UploadWizard} />
+              <Route path="/case/:id" component={CaseDetail} />
             </>
           )}
           {/* Fallback */}
