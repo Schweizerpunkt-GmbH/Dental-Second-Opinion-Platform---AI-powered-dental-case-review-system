@@ -134,7 +134,7 @@ export default function DentistDashboard() {
                         {new Date(review.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/review/${review.id}`}>
+                        <Link href={`/review/${review.caseId}`}>
                           <Button
                             variant="outline"
                             size="sm"

@@ -11,6 +11,7 @@ import PatientDashboard from "@/pages/patient-dashboard";
 import UploadWizard from "@/pages/upload-wizard";
 import CaseDetail from "@/pages/case-detail";
 import DentistDashboard from "@/pages/dentist-dashboard";
+import DentistReview from "@/pages/dentist-review";
 import AdminDashboard from "@/pages/admin-dashboard";
 
 function Router() {
@@ -44,6 +45,7 @@ function Router() {
             <>
               <Route path="/" component={DentistDashboard} />
               <Route path="/dentist" component={DentistDashboard} />
+              <Route path="/review/:id" component={DentistReview} />
             </>
           )}
           {user?.role === 'PATIENT' && (
