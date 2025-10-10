@@ -23,6 +23,7 @@ export default function UploadWizard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedPaymentType, setSelectedPaymentType] = useState<"AI" | "REVIEW" | null>(null);
 
   const form = useForm<z.infer<typeof uploadSchema>>({
     resolver: zodResolver(uploadSchema),
@@ -62,7 +63,29 @@ export default function UploadWizard() {
     });
   };
 
-  const handlePaymentComplete = () => {
+  const paymentMutation = useMutation({
+    mutationFn: async (type: "AI" | "REVIEW") => {
+      const response = await apiRequest("POST", "/api/payments/create-checkout", {
+        caseId,
+        type,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Payment error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSkipPayment = () => {
     setLocation(`/case/${caseId}`);
   };
 
@@ -197,8 +220,17 @@ export default function UploadWizard() {
                         Confidence scoring
                       </li>
                     </ul>
-                    <Button className="w-full hover-elevate active-elevate-2" data-testid="button-pay-ai">
-                      Select AI Analysis
+                    <Button
+                      className="w-full hover-elevate active-elevate-2"
+                      onClick={() => paymentMutation.mutate("AI")}
+                      disabled={paymentMutation.isPending}
+                      data-testid="button-pay-ai"
+                    >
+                      {paymentMutation.isPending ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+                      ) : (
+                        "Select AI Analysis"
+                      )}
                     </Button>
                   </CardContent>
                 </Card>
@@ -224,8 +256,17 @@ export default function UploadWizard() {
                         Expert recommendations
                       </li>
                     </ul>
-                    <Button className="w-full hover-elevate active-elevate-2" data-testid="button-pay-expert">
-                      Select Expert Review
+                    <Button
+                      className="w-full hover-elevate active-elevate-2"
+                      onClick={() => paymentMutation.mutate("REVIEW")}
+                      disabled={paymentMutation.isPending}
+                      data-testid="button-pay-expert"
+                    >
+                      {paymentMutation.isPending ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+                      ) : (
+                        "Select Expert Review"
+                      )}
                     </Button>
                   </CardContent>
                 </Card>
@@ -241,7 +282,7 @@ export default function UploadWizard() {
                   Back
                 </Button>
                 <Button
-                  onClick={handlePaymentComplete}
+                  onClick={handleSkipPayment}
                   variant="outline"
                   data-testid="button-skip-payment"
                   className="flex-1 hover-elevate active-elevate-2"

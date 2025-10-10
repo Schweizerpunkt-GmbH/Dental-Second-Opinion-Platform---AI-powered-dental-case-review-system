@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, FileText, Brain, UserCheck, DollarSign, Download, FileImage, CreditCard } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, FileText, Brain, UserCheck, DollarSign, Download, FileImage, CreditCard, Loader2 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 import type { Case, File, AIReport, HumanReview, Payment } from "@shared/schema";
 
 interface CaseDetail extends Case {
@@ -17,9 +19,33 @@ interface CaseDetail extends Case {
 export default function CaseDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: caseData, isLoading } = useQuery<CaseDetail>({
     queryKey: [`/api/cases/${id}`],
+  });
+
+  const paymentMutation = useMutation({
+    mutationFn: async (type: "AI" | "REVIEW") => {
+      const response = await apiRequest("POST", "/api/payments/create-checkout", {
+        caseId: id,
+        type,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Payment error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -212,15 +238,31 @@ export default function CaseDetail() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {caseData.status === 'DRAFT' && (
-                  <Button className="w-full hover-elevate active-elevate-2" data-testid="button-request-analysis">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Request Analysis
+                  <Button
+                    className="w-full hover-elevate active-elevate-2"
+                    onClick={() => paymentMutation.mutate("AI")}
+                    disabled={paymentMutation.isPending}
+                    data-testid="button-request-analysis"
+                  >
+                    {paymentMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+                    ) : (
+                      <><CreditCard className="mr-2 h-4 w-4" />Request Analysis ($29)</>
+                    )}
                   </Button>
                 )}
                 {caseData.status === 'AI_DONE' && !caseData.reviews?.length && (
-                  <Button className="w-full hover-elevate active-elevate-2" data-testid="button-request-dentist-review">
-                    <UserCheck className="mr-2 h-4 w-4" />
-                    Request Dentist Review
+                  <Button
+                    className="w-full hover-elevate active-elevate-2"
+                    onClick={() => paymentMutation.mutate("REVIEW")}
+                    disabled={paymentMutation.isPending}
+                    data-testid="button-request-dentist-review"
+                  >
+                    {paymentMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+                    ) : (
+                      <><UserCheck className="mr-2 h-4 w-4" />Request Dentist Review ($60)</>
+                    )}
                   </Button>
                 )}
               </CardContent>
