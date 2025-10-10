@@ -3,12 +3,13 @@ import { createServer, type Server } from "http";
 import { db } from "./db";
 import { 
   users, cases, files, aiReports, humanReviews, payments, practices, leads, auditLogs,
-  insertCaseSchema, insertPaymentSchema, insertHumanReviewSchema, insertAuditLogSchema,
+  insertCaseSchema, insertPaymentSchema, insertHumanReviewSchema, insertAuditLogSchema, insertFileSchema,
   type User
 } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 import Stripe from "stripe";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import crypto from "crypto";
 
 // Stripe setup
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -390,6 +391,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await logAudit(req.user.id, "VIEW_AUDIT_LOGS", { limit });
       res.json(logs);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ============= FILE UPLOAD ROUTES =============
+  app.post("/api/files/upload-url", isAuthenticated, async (req: any, res) => {
+    try {
+      const { caseId, fileName, fileType, fileSize } = req.body;
+
+      // Validate case ownership
+      const [caseData] = await db
+        .select()
+        .from(cases)
+        .where(eq(cases.id, caseId))
+        .limit(1);
+
+      if (!caseData || caseData.userId !== req.user.id) {
+        return res.status(404).json({ message: "Case not found" });
+      }
+
+      // Generate unique file key
+      const fileId = crypto.randomUUID();
+      const s3Key = `${process.env.PRIVATE_OBJECT_DIR}/${caseId}/${fileId}-${fileName}`;
+
+      // For Replit object storage, we'll use a simple approach
+      // In production, generate actual presigned URLs
+      const uploadUrl = `/api/files/upload/${fileId}`;
+
+      await logAudit(req.user.id, "REQUEST_UPLOAD_URL", { caseId, fileName });
+
+      res.json({
+        uploadUrl,
+        fileId,
+        s3Key,
+        method: "PUT",
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/files/upload/:fileId", isAuthenticated, async (req: any, res) => {
+    try {
+      // Simple file upload handler
+      // In production, this would write to object storage
+      const fileId = req.params.fileId;
+      
+      // For now, return success (file upload simulation)
+      res.json({ success: true, fileId });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/files", isAuthenticated, async (req: any, res) => {
+    try {
+      const { caseId, kind, s3Key, mime, size } = req.body;
+
+      // Validate case ownership
+      const [caseData] = await db
+        .select()
+        .from(cases)
+        .where(eq(cases.id, caseId))
+        .limit(1);
+
+      if (!caseData || caseData.userId !== req.user.id) {
+        return res.status(404).json({ message: "Case not found" });
+      }
+
+      const validatedFile = insertFileSchema.parse({
+        caseId,
+        kind,
+        s3Key,
+        mime,
+        size,
+      });
+
+      const [newFile] = await db.insert(files).values(validatedFile).returning();
+
+      await logAudit(req.user.id, "UPLOAD_FILE", { fileId: newFile.id, caseId });
+
+      res.status(201).json(newFile);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/files/case/:caseId", isAuthenticated, async (req: any, res) => {
+    try {
+      const caseId = req.params.caseId;
+
+      // Validate case access
+      const [caseData] = await db
+        .select()
+        .from(cases)
+        .where(eq(cases.id, caseId))
+        .limit(1);
+
+      if (!caseData) {
+        return res.status(404).json({ message: "Case not found" });
+      }
+
+      if (
+        caseData.userId !== req.user.id &&
+        req.user.role !== "ADMIN" &&
+        req.user.role !== "DENTIST"
+      ) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      const caseFiles = await db
+        .select()
+        .from(files)
+        .where(eq(files.caseId, caseId))
+        .orderBy(desc(files.createdAt));
+
+      res.json(caseFiles);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

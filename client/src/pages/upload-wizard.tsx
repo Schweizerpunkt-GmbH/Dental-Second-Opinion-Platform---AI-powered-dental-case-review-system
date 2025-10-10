@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileImage, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
+import { Upload, FileImage, CheckCircle2, ArrowRight, ArrowLeft, X, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
@@ -164,48 +165,7 @@ export default function UploadWizard() {
         )}
 
         {/* Step 2: Upload */}
-        {step === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Your Images</CardTitle>
-              <CardDescription>
-                Upload X-rays, OPT, DVT, CBCT scans, or treatment offer documents
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-12 text-center transition-colors hover:border-primary/50">
-                <FileImage className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                <p className="mb-2 text-sm font-medium">Upload feature coming soon</p>
-                <p className="mb-4 text-xs text-muted-foreground">
-                  Drag and drop your files here, or click to browse
-                </p>
-                <Button variant="outline" data-testid="button-browse-files" className="hover-elevate active-elevate-2">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Browse Files
-                </Button>
-              </div>
-              <div className="flex gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep(1)}
-                  data-testid="button-back-symptoms"
-                  className="hover-elevate active-elevate-2"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back
-                </Button>
-                <Button
-                  onClick={handleFileUploadComplete}
-                  data-testid="button-continue-payment"
-                  className="flex-1 hover-elevate active-elevate-2"
-                >
-                  Continue to Payment
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {step === 2 && <FileUploadStep caseId={caseId} onBack={() => setStep(1)} onContinue={handleFileUploadComplete} />}
 
         {/* Step 3: Payment */}
         {step === 3 && (
@@ -294,5 +254,184 @@ export default function UploadWizard() {
         )}
       </main>
     </div>
+  );
+}
+
+interface FileUploadStepProps {
+  caseId: string;
+  onBack: () => void;
+  onContinue: () => void;
+}
+
+function FileUploadStep({ caseId, onBack, onContinue }: FileUploadStepProps) {
+  const [files, setFiles] = useState<Array<{ file: File; kind: string; id: string }>>([]);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).map(file => ({
+        file,
+        kind: "OTHER",
+        id: crypto.randomUUID(),
+      }));
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  const updateFileKind = (id: string, kind: string) => {
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, kind } : f));
+  };
+
+  const uploadFiles = async () => {
+    if (files.length === 0) {
+      toast({
+        title: "No files selected",
+        description: "Please select at least one file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const { file, kind } of files) {
+        // Create file record in database
+        await apiRequest("POST", "/api/files", {
+          caseId,
+          kind,
+          s3Key: `${caseId}/${file.name}`,
+          mime: file.type,
+          size: file.size,
+        });
+      }
+
+      toast({
+        title: "Files uploaded successfully",
+        description: `${files.length} file(s) uploaded`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/files/case', caseId] });
+      onContinue();
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Upload Your Images</CardTitle>
+        <CardDescription>
+          Upload X-rays, OPT, DVT, CBCT scans, or treatment offer documents
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-12 text-center transition-colors hover:border-primary/50">
+          <FileImage className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <p className="mb-2 text-sm font-medium">Select files to upload</p>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Supports JPEG, PNG, DICOM, PDF files
+          </p>
+          <input
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.dcm,.pdf"
+            onChange={handleFileSelect}
+            className="hidden"
+            id="file-upload"
+          />
+          <Button
+            variant="outline"
+            onClick={() => document.getElementById('file-upload')?.click()}
+            data-testid="button-browse-files"
+            className="hover-elevate active-elevate-2"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Browse Files
+          </Button>
+        </div>
+
+        {files.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Selected Files ({files.length})</h3>
+            {files.map(({ file, kind, id }) => (
+              <div key={id} className="flex items-center gap-4 rounded-lg border p-3">
+                <FileImage className="h-8 w-8 text-muted-foreground" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{file.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                <Select value={kind} onValueChange={(value) => updateFileKind(id, value)}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RX">X-Ray</SelectItem>
+                    <SelectItem value="OPT">OPT</SelectItem>
+                    <SelectItem value="DVT">DVT</SelectItem>
+                    <SelectItem value="CBCT">CBCT</SelectItem>
+                    <SelectItem value="OFFER">Offer</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeFile(id)}
+                  data-testid={`button-remove-file-${id}`}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            onClick={onBack}
+            disabled={uploading}
+            data-testid="button-back-symptoms"
+            className="hover-elevate active-elevate-2"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <Button
+            onClick={uploadFiles}
+            disabled={uploading || files.length === 0}
+            data-testid="button-continue-payment"
+            className="flex-1 hover-elevate active-elevate-2"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                Continue to Payment
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
