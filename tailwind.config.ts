@@ -81,6 +81,13 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        medical: {
+          ai: "hsl(var(--ai-analysis) / <alpha-value>)",
+          dentist: "hsl(var(--dentist-review) / <alpha-value>)",
+          payment: "hsl(var(--payment-success) / <alpha-value>)",
+          critical: "hsl(var(--critical-finding) / <alpha-value>)",
+          warning: "hsl(var(--warning) / <alpha-value>)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
