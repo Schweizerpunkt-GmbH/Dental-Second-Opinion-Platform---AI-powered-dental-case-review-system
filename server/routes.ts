@@ -10,6 +10,7 @@ import { eq, and, desc } from "drizzle-orm";
 import Stripe from "stripe";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import crypto from "crypto";
+import { analyzeCase } from "./aiService";
 
 // Stripe setup
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -37,6 +38,49 @@ function requireRole(role: string) {
     }
     next();
   };
+}
+
+// AI Analysis processing function
+async function processAIAnalysis(caseId: string) {
+  try {
+    // Fetch case and files
+    const [caseData] = await db
+      .select()
+      .from(cases)
+      .where(eq(cases.id, caseId))
+      .limit(1);
+
+    if (!caseData) {
+      throw new Error("Case not found");
+    }
+
+    const caseFiles = await db
+      .select()
+      .from(files)
+      .where(eq(files.caseId, caseId));
+
+    // Run AI analysis
+    const result = await analyzeCase(caseId, caseData.symptoms || "", caseFiles);
+
+    // Store AI report
+    await db.insert(aiReports).values({
+      caseId,
+      summary: result.summary,
+      findings: result.findings,
+      confidence: result.confidence,
+    });
+
+    // Update case status
+    await db
+      .update(cases)
+      .set({ status: "AI_DONE" })
+      .where(eq(cases.id, caseId));
+
+    await logAudit(undefined, "AI_ANALYSIS_COMPLETED", { caseId });
+  } catch (error) {
+    console.error("AI analysis error:", error);
+    await logAudit(undefined, "AI_ANALYSIS_FAILED", { caseId, error: String(error) });
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -251,6 +295,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .update(cases)
           .set({ status: "QUEUED" })
           .where(eq(cases.id, metadata.caseId));
+
+        // Trigger AI analysis asynchronously
+        processAIAnalysis(metadata.caseId).catch(console.error);
+      }
+
+      if (metadata?.type === "REVIEW" && metadata.caseId) {
+        // Create review record and assign to dentist
+        const [dentist] = await db
+          .select()
+          .from(users)
+          .where(eq(users.role, "DENTIST"))
+          .limit(1);
+
+        if (dentist) {
+          await db.insert(humanReviews).values({
+            caseId: metadata.caseId,
+            dentistId: dentist.id,
+            status: "REQUESTED",
+          });
+
+          await db
+            .update(cases)
+            .set({ status: "DOCTOR_ASSIGNED" })
+            .where(eq(cases.id, metadata.caseId));
+        }
       }
 
       await logAudit(metadata?.userId, "PAYMENT_COMPLETED", {
