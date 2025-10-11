@@ -44,7 +44,17 @@
     "description": "Radiographies, OPT, scanners CBCT ou offres de traitement",
     "dropzone": "Glissez-déposez les fichiers ici ou cliquez pour parcourir",
     "fileTypes": "Supporte JPEG, PNG, DICOM, PDF",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "symptomsLabel": "Décrivez vos symptômes ou préoccupations",
+    "symptomsPlaceholder": "ex., Douleur dentaire, révision d'offre de traitement, deuxième avis nécessaire...",
+    "selectFiles": "Sélectionner des fichiers",
+    "continueToPayment": "Continuer vers le paiement",
+    "filesSelected": "fichier(s) sélectionné(s)",
+    "noFilesError": "Aucun fichier sélectionné",
+    "noFilesDescription": "Veuillez sélectionner au moins un fichier à télécharger",
+    "missingInfo": "Informations manquantes",
+    "missingInfoDescription": "Veuillez décrire vos symptômes ou préoccupations",
+    "creatingCase": "Création du dossier..."
   },
   "pricing": {
     "title": "Tarifs transparents",
@@ -68,6 +78,43 @@
         "Rapport PDF signé"
       ]
     }
+  },
+  "case": {
+    "notFound": "Dossier introuvable",
+    "backToDashboard": "Retour au tableau de bord",
+    "caseNumber": "Dossier #",
+    "created": "Créé",
+    "symptoms": "Symptômes et préoccupations",
+    "noSymptoms": "Aucun symptôme décrit",
+    "uploadedFiles": "Fichiers téléchargés",
+    "noFiles": "Aucun fichier téléchargé",
+    "aiAnalysis": "Rapport d'analyse IA",
+    "confidenceScore": "Score de confiance",
+    "summary": "Résumé",
+    "findings": "Constatations",
+    "downloadPdf": "Télécharger le rapport PDF",
+    "estimatedCost": "Coût estimé",
+    "potentialSavings": "Économies potentielles identifiées",
+    "originalOffer": "Offre originale",
+    "recommendedPrice": "Prix recommandé",
+    "youSave": "Vous économisez",
+    "savingsMessage": "Selon l'analyse IA, vous pourriez économiser jusqu'à",
+    "comparedToOffer": "par rapport à l'offre originale",
+    "paymentOptions": "Options de paiement",
+    "purchaseAI": "Acheter l'analyse IA",
+    "purchaseExpert": "Demander un avis d'expert",
+    "processing": "En cours de traitement...",
+    "error": "Une erreur s'est produite",
+    "severity": {
+      "low": "Faible",
+      "medium": "Moyen",
+      "high": "Élevé"
+    },
+    "recommendation": "Recommandation"
+  },
+  "cta": {
+    "startSaving": "Commencez à économiser aujourd'hui!",
+    "joinThousands": "Rejoignez des milliers de patients qui ont économisé de l'argent sur les traitements dentaires grâce à notre service de deuxième avis indépendant."
   },
   "common": {
     "loading": "Chargement...",

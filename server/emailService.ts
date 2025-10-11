@@ -1,6 +1,15 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// SMTP configuration from environment variables
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 export async function sendVerificationEmail(
   to: string,
@@ -10,9 +19,9 @@ export async function sendVerificationEmail(
   const verificationUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/verify-email?token=${token}`;
 
   try {
-    await resend.emails.send({
-      from: 'DentalSecondOpinion <noreply@dentalsecondopinion.ch>',
-      to: [to],
+    await transporter.sendMail({
+      from: `"DentalSecondOpinion" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to,
       subject: 'Verify your email address',
       html: `
 <!DOCTYPE html>
@@ -84,9 +93,9 @@ export async function sendWelcomeEmail(
   firstName?: string
 ) {
   try {
-    await resend.emails.send({
-      from: 'DentalSecondOpinion <noreply@dentalsecondopinion.ch>',
-      to: [to],
+    await transporter.sendMail({
+      from: `"DentalSecondOpinion" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to,
       subject: 'Welcome to DentalSecondOpinion!',
       html: `
 <!DOCTYPE html>

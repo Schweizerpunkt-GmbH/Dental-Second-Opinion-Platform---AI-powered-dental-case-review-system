@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CookieConsent } from "@/components/CookieConsent";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
@@ -14,6 +15,8 @@ import CaseDetail from "@/pages/case-detail";
 import DentistDashboard from "@/pages/dentist-dashboard";
 import DentistReview from "@/pages/dentist-review";
 import AdminDashboard from "@/pages/admin-dashboard";
+import Privacy from "@/pages/privacy";
+import Imprint from "@/pages/imprint";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -28,9 +31,14 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes */}
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/imprint" component={Imprint} />
+      
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Landing} />
+          <Route path="/case/:id" component={CaseDetail} />
           <Route path="/:rest*" component={Landing} />
         </>
       ) : (
@@ -77,6 +85,7 @@ export default function App() {
           }>
             <Toaster />
             <Router />
+            <CookieConsent />
           </Suspense>
         </TooltipProvider>
       </ThemeProvider>

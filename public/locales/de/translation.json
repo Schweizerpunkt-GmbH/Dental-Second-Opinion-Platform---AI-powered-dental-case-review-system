@@ -44,7 +44,17 @@
     "description": "Röntgenbilder, OPG, DVT-Aufnahmen oder Behandlungsangebote",
     "dropzone": "Dateien hier ablegen oder klicken zum Durchsuchen",
     "fileTypes": "Unterstützt JPEG, PNG, DICOM, PDF",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "symptomsLabel": "Beschreiben Sie Ihre Symptome oder Anliegen",
+    "symptomsPlaceholder": "z.B., Zahnschmerzen, Behandlungsangebot prüfen, Zweitmeinung gewünscht...",
+    "selectFiles": "Dateien auswählen",
+    "continueToPayment": "Zur Zahlung",
+    "filesSelected": "Datei(en) ausgewählt",
+    "noFilesError": "Keine Dateien ausgewählt",
+    "noFilesDescription": "Bitte wählen Sie mindestens eine Datei zum Hochladen",
+    "missingInfo": "Fehlende Informationen",
+    "missingInfoDescription": "Bitte beschreiben Sie Ihre Symptome oder Anliegen",
+    "creatingCase": "Fall wird erstellt..."
   },
   "pricing": {
     "title": "Transparente Preise",
@@ -68,6 +78,43 @@
         "Signierter PDF-Bericht"
       ]
     }
+  },
+  "case": {
+    "notFound": "Fall nicht gefunden",
+    "backToDashboard": "Zurück zum Dashboard",
+    "caseNumber": "Fall #",
+    "created": "Erstellt",
+    "symptoms": "Symptome & Anliegen",
+    "noSymptoms": "Keine Symptome beschrieben",
+    "uploadedFiles": "Hochgeladene Dateien",
+    "noFiles": "Keine Dateien hochgeladen",
+    "aiAnalysis": "KI-Analysebericht",
+    "confidenceScore": "Konfidenz-Score",
+    "summary": "Zusammenfassung",
+    "findings": "Befunde",
+    "downloadPdf": "PDF-Bericht herunterladen",
+    "estimatedCost": "Geschätzte Kosten",
+    "potentialSavings": "Mögliche Einsparungen identifiziert",
+    "originalOffer": "Original-Angebot",
+    "recommendedPrice": "Empfohlener Preis",
+    "youSave": "Sie sparen",
+    "savingsMessage": "Basierend auf der KI-Analyse könnten Sie bis zu",
+    "comparedToOffer": "im Vergleich zum Original-Angebot sparen",
+    "paymentOptions": "Zahlungsoptionen",
+    "purchaseAI": "KI-Analyse kaufen",
+    "purchaseExpert": "Experten-Beurteilung anfordern",
+    "processing": "Wird verarbeitet...",
+    "error": "Ein Fehler ist aufgetreten",
+    "severity": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    },
+    "recommendation": "Empfehlung"
+  },
+  "cta": {
+    "startSaving": "Beginnen Sie heute zu sparen!",
+    "joinThousands": "Schließen Sie sich Tausenden von Patienten an, die durch unseren unabhängigen Zweitmeinungs-Service Geld bei Zahnbehandlungen gespart haben."
   },
   "common": {
     "loading": "Lädt...",

@@ -44,7 +44,17 @@
     "description": "Radiografie, OPT, scansioni CBCT o offerte di trattamento",
     "dropzone": "Trascina e rilascia i file qui o clicca per sfogliare",
     "fileTypes": "Supporta JPEG, PNG, DICOM, PDF",
-    "continue": "Continua"
+    "continue": "Continua",
+    "symptomsLabel": "Descrivi i tuoi sintomi o preoccupazioni",
+    "symptomsPlaceholder": "es., Dolore ai denti, revisione offerta di trattamento, secondo parere necessario...",
+    "selectFiles": "Seleziona file",
+    "continueToPayment": "Continua al pagamento",
+    "filesSelected": "file selezionati",
+    "noFilesError": "Nessun file selezionato",
+    "noFilesDescription": "Seleziona almeno un file da caricare",
+    "missingInfo": "Informazioni mancanti",
+    "missingInfoDescription": "Descrivi i tuoi sintomi o preoccupazioni",
+    "creatingCase": "Creazione caso..."
   },
   "pricing": {
     "title": "Prezzi trasparenti",
@@ -68,6 +78,43 @@
         "Rapporto PDF firmato"
       ]
     }
+  },
+  "case": {
+    "notFound": "Caso non trovato",
+    "backToDashboard": "Torna alla Dashboard",
+    "caseNumber": "Caso #",
+    "created": "Creato",
+    "symptoms": "Sintomi e preoccupazioni",
+    "noSymptoms": "Nessun sintomo descritto",
+    "uploadedFiles": "File caricati",
+    "noFiles": "Nessun file caricato",
+    "aiAnalysis": "Rapporto analisi IA",
+    "confidenceScore": "Punteggio di confidenza",
+    "summary": "Riepilogo",
+    "findings": "Risultati",
+    "downloadPdf": "Scarica rapporto PDF",
+    "estimatedCost": "Costo stimato",
+    "potentialSavings": "Risparmi potenziali identificati",
+    "originalOffer": "Offerta originale",
+    "recommendedPrice": "Prezzo consigliato",
+    "youSave": "Risparmi",
+    "savingsMessage": "In base all'analisi IA, potresti risparmiare fino a",
+    "comparedToOffer": "rispetto all'offerta originale",
+    "paymentOptions": "Opzioni di pagamento",
+    "purchaseAI": "Acquista analisi IA",
+    "purchaseExpert": "Richiedi parere esperto",
+    "processing": "Elaborazione...",
+    "error": "Si è verificato un errore",
+    "severity": {
+      "low": "Basso",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "recommendation": "Raccomandazione"
+  },
+  "cta": {
+    "startSaving": "Inizia a risparmiare oggi!",
+    "joinThousands": "Unisciti a migliaia di pazienti che hanno risparmiato denaro sui trattamenti dentali con il nostro servizio di secondo parere indipendente."
   },
   "common": {
     "loading": "Caricamento...",

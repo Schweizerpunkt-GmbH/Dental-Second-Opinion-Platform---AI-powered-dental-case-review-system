@@ -44,7 +44,17 @@
     "description": "X-rays, OPT, CBCT scans, or treatment offers",
     "dropzone": "Drag & drop files here or click to browse",
     "fileTypes": "Supports JPEG, PNG, DICOM, PDF",
-    "continue": "Continue"
+    "continue": "Continue",
+    "symptomsLabel": "Describe your symptoms or concerns",
+    "symptomsPlaceholder": "e.g., Tooth pain, treatment offer review, second opinion needed...",
+    "selectFiles": "Select Files",
+    "continueToPayment": "Continue to Payment",
+    "filesSelected": "file(s) selected",
+    "noFilesError": "No files selected",
+    "noFilesDescription": "Please select at least one file to upload",
+    "missingInfo": "Missing information",
+    "missingInfoDescription": "Please describe your symptoms or concerns",
+    "creatingCase": "Creating case..."
   },
   "pricing": {
     "title": "Transparent Pricing",
@@ -68,6 +78,43 @@
         "Signed PDF report"
       ]
     }
+  },
+  "case": {
+    "notFound": "Case not found",
+    "backToDashboard": "Back to Dashboard",
+    "caseNumber": "Case #",
+    "created": "Created",
+    "symptoms": "Symptoms & Concerns",
+    "noSymptoms": "No symptoms described",
+    "uploadedFiles": "Uploaded Files",
+    "noFiles": "No files uploaded",
+    "aiAnalysis": "AI Analysis Report",
+    "confidenceScore": "Confidence Score",
+    "summary": "Summary",
+    "findings": "Findings",
+    "downloadPdf": "Download PDF Report",
+    "estimatedCost": "Est. Cost",
+    "potentialSavings": "Potential Savings Identified",
+    "originalOffer": "Original Offer",
+    "recommendedPrice": "Recommended Price",
+    "youSave": "You Save",
+    "savingsMessage": "Based on AI analysis, you could save up to",
+    "comparedToOffer": "compared to the original offer",
+    "paymentOptions": "Payment Options",
+    "purchaseAI": "Purchase AI Analysis",
+    "purchaseExpert": "Request Expert Review",
+    "processing": "Processing...",
+    "error": "An error occurred",
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "recommendation": "Recommendation"
+  },
+  "cta": {
+    "startSaving": "Start Saving Today!",
+    "joinThousands": "Join thousands of patients who have saved money on dental treatments with our independent second opinion service."
   },
   "common": {
     "loading": "Loading...",
