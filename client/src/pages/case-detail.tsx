@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, FileText, Brain, UserCheck, DollarSign, Download, FileImage, CreditCard, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, Brain, UserCheck, DollarSign, Download, FileImage, CreditCard, Loader2, TrendingDown } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import type { Case, File, AIReport, HumanReview, Payment } from "@shared/schema";
@@ -172,6 +172,47 @@ export default function CaseDetail() {
               </CardContent>
             </Card>
 
+            {/* Cost Savings (if available) */}
+            {caseData.aiReport?.potentialSavingsCHF && caseData.aiReport.potentialSavingsCHF > 0 && (
+              <Card className="border-green-500/20 bg-green-50 dark:bg-green-950/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                    <TrendingDown className="h-5 w-5" />
+                    Potential Savings Identified
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">Original Offer</p>
+                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                        {caseData.aiReport.originalPriceCHF?.toFixed(2)} CHF
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">Recommended Price</p>
+                      <p className="text-2xl font-bold">
+                        {caseData.aiReport.recommendedPriceCHF?.toFixed(2)} CHF
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">You Save</p>
+                      <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {caseData.aiReport.potentialSavingsCHF.toFixed(2)} CHF
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-center text-sm text-muted-foreground">
+                    Based on AI analysis, you could save up to{' '}
+                    <span className="font-semibold text-green-600 dark:text-green-400">
+                      {((caseData.aiReport.potentialSavingsCHF / (caseData.aiReport.originalPriceCHF || 1)) * 100).toFixed(0)}%
+                    </span>{' '}
+                    compared to the original offer
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* AI Report */}
             {caseData.aiReport && (
               <Card className="border-medical-ai/20 bg-medical-ai/5">
@@ -192,9 +233,28 @@ export default function CaseDetail() {
                   <Separator />
                   <div>
                     <h4 className="mb-2 text-sm font-semibold">Findings</h4>
-                    <pre className="max-h-64 overflow-auto rounded-lg bg-muted p-3 text-xs">
-                      {JSON.stringify(caseData.aiReport.findings, null, 2)}
-                    </pre>
+                    <div className="space-y-3">
+                      {caseData.aiReport.findings.map((finding: any, idx: number) => (
+                        <div key={idx} className="rounded-lg border bg-background/50 p-3">
+                          <div className="mb-2 flex items-center justify-between">
+                            <h5 className="font-semibold text-sm">{finding.condition}</h5>
+                            <Badge variant={
+                              finding.severity === 'high' ? 'destructive' :
+                              finding.severity === 'medium' ? 'default' : 'secondary'
+                            }>
+                              {finding.severity}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-2">{finding.description}</p>
+                          <p className="text-xs"><strong>Recommendation:</strong> {finding.recommendation}</p>
+                          {finding.estimatedCostCHF && (
+                            <p className="mt-2 text-sm font-semibold text-primary">
+                              Est. Cost: {finding.estimatedCostCHF} CHF
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   {caseData.aiReport.pdfS3Key && (
                     <Button className="w-full hover-elevate active-elevate-2" data-testid="button-download-ai-report">

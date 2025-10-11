@@ -74,6 +74,9 @@ export const aiReports = pgTable("ai_reports", {
   findings: jsonb("findings").notNull(),
   confidence: real("confidence").notNull(),
   pdfS3Key: varchar("pdf_s3_key").notNull(),
+  originalPriceCHF: real("original_price_chf"),
+  recommendedPriceCHF: real("recommended_price_chf"),
+  potentialSavingsCHF: real("potential_savings_chf"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

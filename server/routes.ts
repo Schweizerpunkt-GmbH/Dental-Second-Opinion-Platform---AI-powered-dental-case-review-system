@@ -62,12 +62,15 @@ async function processAIAnalysis(caseId: string) {
     // Run AI analysis
     const result = await analyzeCase(caseId, caseData.symptoms || "", caseFiles);
 
-    // Store AI report
+    // Store AI report with cost savings
     await db.insert(aiReports).values({
       caseId,
       summary: result.summary,
       findings: result.findings,
       confidence: result.confidence,
+      originalPriceCHF: result.originalPriceCHF,
+      recommendedPriceCHF: result.recommendedPriceCHF,
+      potentialSavingsCHF: result.potentialSavingsCHF,
     });
 
     // Update case status

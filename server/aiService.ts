@@ -7,8 +7,12 @@ interface AIAnalysisResult {
     severity: "low" | "medium" | "high";
     description: string;
     recommendation: string;
+    estimatedCostCHF?: number;
   }[];
   confidence: number;
+  originalPriceCHF?: number;
+  recommendedPriceCHF?: number;
+  potentialSavingsCHF?: number;
 }
 
 export async function analyzeCase(
@@ -32,7 +36,8 @@ export async function analyzeCase(
       condition: "Dental Caries",
       severity: "medium" as const,
       description: "Multiple carious lesions detected in posterior teeth, particularly molars. Radiographic density suggests moderately advanced decay requiring intervention.",
-      recommendation: "Recommend restorative treatment with composite fillings or inlays. Consider prophylactic fluoride treatment for remaining at-risk teeth."
+      recommendation: "Recommend restorative treatment with composite fillings or inlays. Consider prophylactic fluoride treatment for remaining at-risk teeth.",
+      estimatedCostCHF: 450
     });
   }
 
@@ -41,7 +46,8 @@ export async function analyzeCase(
       condition: "Bone Density Assessment",
       severity: "low" as const,
       description: "CBCT scan shows adequate bone density in mandibular region. No significant bone loss or pathology detected.",
-      recommendation: "Suitable for implant placement if needed. Regular monitoring recommended."
+      recommendation: "Suitable for implant placement if needed. Regular monitoring recommended.",
+      estimatedCostCHF: 2800
     });
   }
 
@@ -50,7 +56,8 @@ export async function analyzeCase(
       condition: "Potential Pulpitis",
       severity: "high" as const,
       description: "Patient-reported pain symptoms combined with radiographic findings suggest possible pulpal involvement. Thermal sensitivity may be present.",
-      recommendation: "Urgent dental examination required. May require endodontic treatment (root canal) or extraction depending on extent of damage."
+      recommendation: "Urgent dental examination required. May require endodontic treatment (root canal) or extraction depending on extent of damage.",
+      estimatedCostCHF: 850
     });
   }
 
@@ -59,7 +66,8 @@ export async function analyzeCase(
       condition: "Dentin Hypersensitivity",
       severity: "low" as const,
       description: "Sensitivity symptoms suggest exposed dentin or enamel erosion. Common causes include aggressive brushing or acidic diet.",
-      recommendation: "Desensitizing toothpaste application. Consider fluoride varnish treatment. Address underlying causes."
+      recommendation: "Desensitizing toothpaste application. Consider fluoride varnish treatment. Address underlying causes.",
+      estimatedCostCHF: 150
     });
   }
 
@@ -69,7 +77,8 @@ export async function analyzeCase(
       condition: "Routine Dental Assessment",
       severity: "low" as const,
       description: "No acute pathology detected in available imaging. Regular dental maintenance appears adequate.",
-      recommendation: "Continue routine dental hygiene. Schedule regular check-ups every 6 months."
+      recommendation: "Continue routine dental hygiene. Schedule regular check-ups every 6 months.",
+      estimatedCostCHF: 120
     });
   }
 
@@ -84,10 +93,27 @@ export async function analyzeCase(
     ? findings[0].description
     : `Analysis of ${files.length} image(s) reveals ${findings.length} significant finding(s). ${findings[0].description}`;
 
+  // Calculate pricing and savings
+  const recommendedPriceCHF = findings.reduce((sum, f) => sum + (f.estimatedCostCHF || 0), 0);
+  
+  // If offer is present, simulate original price (typically higher)
+  let originalPriceCHF: number | undefined;
+  let potentialSavingsCHF: number | undefined;
+  
+  if (hasOffer) {
+    // Simulate original offer price being 20-40% higher
+    const markup = 1.25 + Math.random() * 0.15; // 1.25 to 1.40
+    originalPriceCHF = Math.round(recommendedPriceCHF * markup);
+    potentialSavingsCHF = originalPriceCHF - recommendedPriceCHF;
+  }
+
   return {
     summary,
     findings,
-    confidence
+    confidence,
+    originalPriceCHF,
+    recommendedPriceCHF,
+    potentialSavingsCHF
   };
 }
 
