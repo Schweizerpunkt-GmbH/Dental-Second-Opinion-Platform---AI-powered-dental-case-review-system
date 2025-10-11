@@ -13,6 +13,9 @@ import type { Case, User, Payment } from "@shared/schema";
 
 export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [newPracticeName, setNewPracticeName] = useState("");
+  const [newPracticeCity, setNewPracticeCity] = useState("");
+  const { toast } = useToast();
 
   const { data: stats } = useQuery<{
     totalCases: number;
@@ -25,6 +28,32 @@ export default function AdminDashboard() {
 
   const { data: cases = [] } = useQuery<(Case & { user: User; payments: Payment[] })[]>({
     queryKey: ['/api/admin/cases'],
+  });
+
+  const { data: practices = [] } = useQuery<any[]>({
+    queryKey: ['/api/admin/practices'],
+  });
+
+  const { data: leads = [] } = useQuery<any[]>({
+    queryKey: ['/api/admin/leads'],
+  });
+
+  const createPracticeMutation = useMutation({
+    mutationFn: async (data: { name: string; city: string }) => {
+      return await apiRequest('/api/admin/practices', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/practices'] });
+      setNewPracticeName("");
+      setNewPracticeCity("");
+      toast({ title: "Practice created successfully" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error creating practice", description: error.message, variant: "destructive" });
+    },
   });
 
   const filteredCases = cases.filter(c =>
@@ -200,16 +229,72 @@ export default function AdminDashboard() {
 
           {/* Practices Tab */}
           <TabsContent value="practices">
-            <Card>
+            <Card className="mb-4">
               <CardHeader>
-                <CardTitle>Practice Management</CardTitle>
+                <CardTitle>Add New Practice</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Building2 className="mb-4 h-12 w-12 text-muted-foreground" />
-                  <p className="mb-2 text-lg font-medium">Practice Management Coming Soon</p>
-                  <p className="text-sm text-muted-foreground">Manage dental practices, set lead fees, and view statistics</p>
+                <div className="flex gap-4">
+                  <Input
+                    placeholder="Practice name"
+                    value={newPracticeName}
+                    onChange={(e) => setNewPracticeName(e.target.value)}
+                    data-testid="input-practice-name"
+                  />
+                  <Input
+                    placeholder="City"
+                    value={newPracticeCity}
+                    onChange={(e) => setNewPracticeCity(e.target.value)}
+                    data-testid="input-practice-city"
+                  />
+                  <Button
+                    onClick={() => createPracticeMutation.mutate({ name: newPracticeName, city: newPracticeCity })}
+                    disabled={!newPracticeName.trim() || createPracticeMutation.isPending}
+                    data-testid="button-create-practice"
+                  >
+                    {createPracticeMutation.isPending ? "Creating..." : "Add Practice"}
+                  </Button>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>All Practices ({practices.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {practices.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Building2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                    <p className="mb-2 text-lg font-medium">No practices yet</p>
+                    <p className="text-sm text-muted-foreground">Add your first practice above</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>City</TableHead>
+                          <TableHead>Country</TableHead>
+                          <TableHead>Lead Fee</TableHead>
+                          <TableHead>Roaadent ID</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {practices.map((practice) => (
+                          <TableRow key={practice.id} className="hover-elevate">
+                            <TableCell className="font-medium">{practice.name}</TableCell>
+                            <TableCell>{practice.city || '-'}</TableCell>
+                            <TableCell>{practice.country || '-'}</TableCell>
+                            <TableCell>{practice.leadFee / 100} CHF</TableCell>
+                            <TableCell className="font-mono text-xs">{practice.roaadentOrgId || '-'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -219,19 +304,76 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Lead Management</CardTitle>
-                  <Button variant="outline" data-testid="button-export-leads" className="hover-elevate active-elevate-2">
+                  <CardTitle>All Leads ({leads.length})</CardTitle>
+                  <Button 
+                    variant="outline" 
+                    data-testid="button-export-leads" 
+                    className="hover-elevate active-elevate-2"
+                    onClick={() => {
+                      const csv = [
+                        ['Lead ID', 'Case ID', 'Practice', 'Status', 'Payout', 'Created'],
+                        ...leads.map((l: any) => [
+                          l.id,
+                          l.caseId,
+                          l.practice?.name || '-',
+                          l.status,
+                          `${l.payoutCents / 100} CHF`,
+                          new Date(l.createdAt).toLocaleDateString()
+                        ])
+                      ].map(row => row.join(',')).join('\n');
+                      
+                      const blob = new Blob([csv], { type: 'text/csv' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
+                      a.click();
+                    }}
+                  >
                     <Download className="mr-2 h-4 w-4" />
-                    Export Leads
+                    Export CSV
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Link2 className="mb-4 h-12 w-12 text-muted-foreground" />
-                  <p className="mb-2 text-lg font-medium">Lead Routing Coming Soon</p>
-                  <p className="text-sm text-muted-foreground">View leads, manage assignments, and track payouts</p>
-                </div>
+                {leads.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Link2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                    <p className="mb-2 text-lg font-medium">No leads yet</p>
+                    <p className="text-sm text-muted-foreground">Leads will appear here when cases are matched to practices</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Lead ID</TableHead>
+                          <TableHead>Practice</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Payout</TableHead>
+                          <TableHead>Created</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {leads.map((lead: any) => (
+                          <TableRow key={lead.id} className="hover-elevate">
+                            <TableCell className="font-mono text-xs">{lead.id.slice(0, 8)}</TableCell>
+                            <TableCell className="font-medium">{lead.practice?.name || 'Unknown'}</TableCell>
+                            <TableCell>
+                              <Badge variant={lead.status === 'PAID' ? 'default' : 'outline'}>
+                                {lead.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{lead.payoutCents / 100} CHF</TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(lead.createdAt).toLocaleDateString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

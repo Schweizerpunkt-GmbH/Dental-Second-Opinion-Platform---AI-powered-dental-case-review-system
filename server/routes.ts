@@ -508,6 +508,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============= ADMIN - PRACTICES =============
+  app.get("/api/admin/practices", isAuthenticated, requireRole("ADMIN"), async (req: any, res) => {
+    try {
+      const allPractices = await db
+        .select()
+        .from(practices)
+        .orderBy(desc(practices.name));
+
+      res.json(allPractices);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/admin/practices", isAuthenticated, requireRole("ADMIN"), async (req: any, res) => {
+    try {
+      const { name, city, country, roaadentOrgId, leadFee } = req.body;
+
+      const [newPractice] = await db.insert(practices).values({
+        name,
+        city,
+        country,
+        roaadentOrgId,
+        leadFee: leadFee || 0,
+      }).returning();
+
+      await logAudit(req.user.id, "CREATE_PRACTICE", { practiceId: newPractice.id });
+
+      res.status(201).json(newPractice);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // ============= ADMIN - LEADS =============
+  app.get("/api/admin/leads", isAuthenticated, requireRole("ADMIN"), async (req: any, res) => {
+    try {
+      const allLeads = await db
+        .select({
+          id: leads.id,
+          caseId: leads.caseId,
+          practiceId: leads.practiceId,
+          status: leads.status,
+          payoutCents: leads.payoutCents,
+          createdAt: leads.createdAt,
+          practice: practices,
+          case: cases,
+        })
+        .from(leads)
+        .leftJoin(practices, eq(leads.practiceId, practices.id))
+        .leftJoin(cases, eq(leads.caseId, cases.id))
+        .orderBy(desc(leads.createdAt));
+
+      res.json(allLeads);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/admin/leads", isAuthenticated, requireRole("ADMIN"), async (req: any, res) => {
+    try {
+      const { caseId, practiceId, payoutCents } = req.body;
+
+      const [newLead] = await db.insert(leads).values({
+        caseId,
+        practiceId,
+        status: 'CREATED',
+        payoutCents: payoutCents || 0,
+      }).returning();
+
+      await logAudit(req.user.id, "CREATE_LEAD", { leadId: newLead.id });
+
+      res.status(201).json(newLead);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.get("/api/admin/audit-logs", isAuthenticated, requireRole("ADMIN"), async (req: any, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 100;
