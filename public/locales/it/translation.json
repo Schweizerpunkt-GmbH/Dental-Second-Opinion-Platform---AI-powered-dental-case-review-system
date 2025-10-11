@@ -1,81 +1,81 @@
 {
   "nav": {
     "home": "Home",
-    "login": "Sign In",
+    "login": "Accedi",
     "dashboard": "Dashboard",
-    "logout": "Sign Out"
+    "logout": "Esci"
   },
   "hero": {
-    "title": "Get Your Professional Dental Second Opinion",
-    "subtitle": "Neutral and professional analysis for only 9.90 CHF",
-    "cta": "Upload Your Images Now",
-    "trustBadge": "Trusted by thousands of patients"
+    "title": "Ottieni il tuo secondo parere dentale professionale",
+    "subtitle": "Analisi neutrale e professionale per soli 9.90 CHF",
+    "cta": "Carica le tue immagini ora",
+    "trustBadge": "Affidato da migliaia di pazienti"
   },
   "metrics": {
-    "analyses": "15,000+",
-    "analysesLabel": "Analyses Completed",
-    "patients": "12,000+",
-    "patientsLabel": "Satisfied Patients",
-    "savings": "3.5M+ CHF",
-    "savingsLabel": "Total Savings",
-    "savingsCta": "Save Money Too!"
+    "analyses": "15'000+",
+    "analysesLabel": "Analisi completate",
+    "patients": "12'000+",
+    "patientsLabel": "Pazienti soddisfatti",
+    "savings": "3.5M CHF",
+    "savingsLabel": "Risparmi totali",
+    "savingsCta": "Risparmia anche tu!"
   },
   "benefits": {
-    "title": "Why Choose Our Second Opinion Service?",
+    "title": "Perché scegliere il nostro servizio di secondo parere?",
     "neutral": {
-      "title": "100% Neutral",
-      "description": "Independent analysis without conflicts of interest"
+      "title": "100% Neutrale",
+      "description": "Analisi indipendente senza conflitti di interesse"
     },
     "fast": {
-      "title": "Fast Results",
-      "description": "AI-powered analysis in minutes, expert review within 24h"
+      "title": "Risultati veloci",
+      "description": "Analisi IA in pochi minuti, parere esperto entro 24h"
     },
     "affordable": {
-      "title": "Affordable",
-      "description": "Professional second opinion from just 9.90 CHF"
+      "title": "Conveniente",
+      "description": "Secondo parere professionale da soli 9.90 CHF"
     },
     "expert": {
-      "title": "Expert Dentists",
-      "description": "Reviewed by licensed dental professionals"
+      "title": "Dentisti esperti",
+      "description": "Revisionato da professionisti odontoiatrici autorizzati"
     }
   },
   "upload": {
-    "title": "Upload Your Dental Images",
-    "description": "X-rays, OPT, CBCT scans, or treatment offers",
-    "dropzone": "Drag & drop files here or click to browse",
-    "fileTypes": "Supports JPEG, PNG, DICOM, PDF",
-    "continue": "Continue"
+    "title": "Carica le tue immagini dentali",
+    "description": "Radiografie, OPT, scansioni CBCT o offerte di trattamento",
+    "dropzone": "Trascina e rilascia i file qui o clicca per sfogliare",
+    "fileTypes": "Supporta JPEG, PNG, DICOM, PDF",
+    "continue": "Continua"
   },
   "pricing": {
-    "title": "Transparent Pricing",
+    "title": "Prezzi trasparenti",
     "ai": {
-      "name": "AI Analysis",
+      "name": "Analisi IA",
       "price": "9.90 CHF",
       "features": [
-        "Instant AI-powered analysis",
-        "Detailed findings report",
-        "Confidence scoring",
-        "PDF download"
+        "Analisi IA istantanea",
+        "Rapporto dettagliato dei risultati",
+        "Punteggio di confidenza",
+        "Download PDF"
       ]
     },
     "expert": {
-      "name": "Expert Review",
+      "name": "Parere esperto",
       "price": "60 CHF",
       "features": [
-        "Licensed dentist review",
-        "Detailed clinical notes",
-        "Treatment recommendations",
-        "Signed PDF report"
+        "Revisione da dentista autorizzato",
+        "Note cliniche dettagliate",
+        "Raccomandazioni di trattamento",
+        "Rapporto PDF firmato"
       ]
     }
   },
   "common": {
-    "loading": "Loading...",
-    "error": "An error occurred",
-    "back": "Back",
-    "next": "Next",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save"
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "back": "Indietro",
+    "next": "Avanti",
+    "submit": "Invia",
+    "cancel": "Annulla",
+    "save": "Salva"
   }
 }

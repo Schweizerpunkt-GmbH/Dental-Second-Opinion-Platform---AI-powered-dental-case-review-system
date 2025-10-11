@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Footer } from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
 import {
   Upload,
@@ -364,12 +365,7 @@ export default function Landing() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 DentalSecondOpinion. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

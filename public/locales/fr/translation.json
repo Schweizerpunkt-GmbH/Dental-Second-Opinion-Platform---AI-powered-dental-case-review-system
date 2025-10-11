@@ -1,81 +1,81 @@
 {
   "nav": {
-    "home": "Home",
-    "login": "Sign In",
-    "dashboard": "Dashboard",
-    "logout": "Sign Out"
+    "home": "Accueil",
+    "login": "Se connecter",
+    "dashboard": "Tableau de bord",
+    "logout": "Se déconnecter"
   },
   "hero": {
-    "title": "Get Your Professional Dental Second Opinion",
-    "subtitle": "Neutral and professional analysis for only 9.90 CHF",
-    "cta": "Upload Your Images Now",
-    "trustBadge": "Trusted by thousands of patients"
+    "title": "Obtenez votre deuxième avis dentaire professionnel",
+    "subtitle": "Analyse neutre et professionnelle pour seulement 9.90 CHF",
+    "cta": "Télécharger vos images maintenant",
+    "trustBadge": "Approuvé par des milliers de patients"
   },
   "metrics": {
-    "analyses": "15,000+",
-    "analysesLabel": "Analyses Completed",
-    "patients": "12,000+",
-    "patientsLabel": "Satisfied Patients",
-    "savings": "3.5M+ CHF",
-    "savingsLabel": "Total Savings",
-    "savingsCta": "Save Money Too!"
+    "analyses": "15'000+",
+    "analysesLabel": "Analyses complétées",
+    "patients": "12'000+",
+    "patientsLabel": "Patients satisfaits",
+    "savings": "3.5M CHF",
+    "savingsLabel": "Économies totales",
+    "savingsCta": "Économisez aussi!"
   },
   "benefits": {
-    "title": "Why Choose Our Second Opinion Service?",
+    "title": "Pourquoi choisir notre service de deuxième avis?",
     "neutral": {
-      "title": "100% Neutral",
-      "description": "Independent analysis without conflicts of interest"
+      "title": "100% Neutre",
+      "description": "Analyse indépendante sans conflit d'intérêts"
     },
     "fast": {
-      "title": "Fast Results",
-      "description": "AI-powered analysis in minutes, expert review within 24h"
+      "title": "Résultats rapides",
+      "description": "Analyse IA en quelques minutes, avis d'expert sous 24h"
     },
     "affordable": {
-      "title": "Affordable",
-      "description": "Professional second opinion from just 9.90 CHF"
+      "title": "Abordable",
+      "description": "Deuxième avis professionnel dès 9.90 CHF"
     },
     "expert": {
-      "title": "Expert Dentists",
-      "description": "Reviewed by licensed dental professionals"
+      "title": "Dentistes experts",
+      "description": "Révisé par des professionnels dentaires agréés"
     }
   },
   "upload": {
-    "title": "Upload Your Dental Images",
-    "description": "X-rays, OPT, CBCT scans, or treatment offers",
-    "dropzone": "Drag & drop files here or click to browse",
-    "fileTypes": "Supports JPEG, PNG, DICOM, PDF",
-    "continue": "Continue"
+    "title": "Téléchargez vos images dentaires",
+    "description": "Radiographies, OPT, scanners CBCT ou offres de traitement",
+    "dropzone": "Glissez-déposez les fichiers ici ou cliquez pour parcourir",
+    "fileTypes": "Supporte JPEG, PNG, DICOM, PDF",
+    "continue": "Continuer"
   },
   "pricing": {
-    "title": "Transparent Pricing",
+    "title": "Tarifs transparents",
     "ai": {
-      "name": "AI Analysis",
+      "name": "Analyse IA",
       "price": "9.90 CHF",
       "features": [
-        "Instant AI-powered analysis",
-        "Detailed findings report",
-        "Confidence scoring",
-        "PDF download"
+        "Analyse IA instantanée",
+        "Rapport détaillé des résultats",
+        "Score de confiance",
+        "Téléchargement PDF"
       ]
     },
     "expert": {
-      "name": "Expert Review",
+      "name": "Avis d'expert",
       "price": "60 CHF",
       "features": [
-        "Licensed dentist review",
-        "Detailed clinical notes",
-        "Treatment recommendations",
-        "Signed PDF report"
+        "Révision par dentiste agréé",
+        "Notes cliniques détaillées",
+        "Recommandations de traitement",
+        "Rapport PDF signé"
       ]
     }
   },
   "common": {
-    "loading": "Loading...",
-    "error": "An error occurred",
-    "back": "Back",
-    "next": "Next",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save"
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
   }
 }
