@@ -96,10 +96,14 @@ export function CookieConsent() {
                 Read our{' '}
                 <a href="/privacy" className="text-primary underline-offset-4 hover:underline">
                   Privacy Policy
-                </a>{' '}
-                and{' '}
-                <a href="/terms" className="text-primary underline-offset-4 hover:underline">
-                  Terms of Service
+                </a>
+                ,{' '}
+                <a href="/disclaimer" className="text-primary underline-offset-4 hover:underline">
+                  Medical Disclaimer
+                </a>
+                {' '}and{' '}
+                <a href="/imprint" className="text-primary underline-offset-4 hover:underline">
+                  Imprint
                 </a>
                 .
               </p>
