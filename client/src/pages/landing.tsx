@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -120,19 +121,45 @@ export default function Landing() {
       <main>
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-20">
-          <div className="mx-auto max-w-4xl text-center">
-            <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20" data-testid="badge-trust">
-              <Shield className="mr-1 h-3 w-3" />
-              {t('hero.trustBadge')}
-            </Badge>
-            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+          <motion.div 
+            className="mx-auto max-w-4xl text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+            >
+              <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20" data-testid="badge-trust">
+                <Shield className="mr-1 h-3 w-3" />
+                {t('hero.trustBadge')}
+              </Badge>
+            </motion.div>
+            <motion.h1 
+              className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               {t('hero.title')}
-            </h1>
-            <p className="mb-8 text-xl text-muted-foreground">
+            </motion.h1>
+            <motion.p 
+              className="mb-8 text-xl text-muted-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
               {t('hero.subtitle')}
-            </p>
+            </motion.p>
 
             {/* File Upload */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
             <Card className="mx-auto mb-12 max-w-2xl border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center justify-center gap-2">
@@ -199,7 +226,8 @@ export default function Landing() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* Metrics Section */}
@@ -225,8 +253,22 @@ export default function Landing() {
 
         {/* Benefits Section */}
         <section className="container mx-auto px-4 py-20">
-          <h2 className="mb-12 text-center text-3xl font-bold">{t('benefits.title')}</h2>
+          <motion.h2 
+            className="mb-12 text-center text-3xl font-bold"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            {t('benefits.title')}
+          </motion.h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
             <Card className="hover-elevate">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -238,7 +280,14 @@ export default function Landing() {
                 <p className="text-sm text-muted-foreground">{t('benefits.neutral.description')}</p>
               </CardContent>
             </Card>
+            </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
             <Card className="hover-elevate">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -250,7 +299,14 @@ export default function Landing() {
                 <p className="text-sm text-muted-foreground">{t('benefits.fast.description')}</p>
               </CardContent>
             </Card>
+            </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
             <Card className="hover-elevate">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -262,7 +318,14 @@ export default function Landing() {
                 <p className="text-sm text-muted-foreground">{t('benefits.affordable.description')}</p>
               </CardContent>
             </Card>
+            </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
             <Card className="hover-elevate">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -274,6 +337,7 @@ export default function Landing() {
                 <p className="text-sm text-muted-foreground">{t('benefits.expert.description')}</p>
               </CardContent>
             </Card>
+            </motion.div>
           </div>
         </section>
 

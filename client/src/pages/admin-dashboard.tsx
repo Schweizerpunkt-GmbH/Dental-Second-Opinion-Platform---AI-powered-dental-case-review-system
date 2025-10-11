@@ -1,11 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Users, FileText, DollarSign, TrendingUp, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, FileText, DollarSign, TrendingUp, Search, Building2, Link2, Download } from "lucide-react";
 import { useState } from "react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Case, User, Payment } from "@shared/schema";
 
 export default function AdminDashboard() {
@@ -92,7 +95,25 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Cases Management */}
+        {/* Tabbed Management */}
+        <Tabs defaultValue="cases" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="cases" data-testid="tab-cases">
+              <FileText className="mr-2 h-4 w-4" />
+              Cases
+            </TabsTrigger>
+            <TabsTrigger value="practices" data-testid="tab-practices">
+              <Building2 className="mr-2 h-4 w-4" />
+              Practices
+            </TabsTrigger>
+            <TabsTrigger value="leads" data-testid="tab-leads">
+              <Link2 className="mr-2 h-4 w-4" />
+              Leads
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Cases Tab */}
+          <TabsContent value="cases">
         <Card>
           <CardHeader>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -175,6 +196,46 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          {/* Practices Tab */}
+          <TabsContent value="practices">
+            <Card>
+              <CardHeader>
+                <CardTitle>Practice Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Building2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                  <p className="mb-2 text-lg font-medium">Practice Management Coming Soon</p>
+                  <p className="text-sm text-muted-foreground">Manage dental practices, set lead fees, and view statistics</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Leads Tab */}
+          <TabsContent value="leads">
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <CardTitle>Lead Management</CardTitle>
+                  <Button variant="outline" data-testid="button-export-leads" className="hover-elevate active-elevate-2">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Leads
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Link2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                  <p className="mb-2 text-lg font-medium">Lead Routing Coming Soon</p>
+                  <p className="text-sm text-muted-foreground">View leads, manage assignments, and track payouts</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
