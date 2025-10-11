@@ -1,4 +1,5 @@
 import { Footer } from '@/components/Footer';
+import { SEO } from '@/components/SEO';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText } from 'lucide-react';
@@ -6,6 +7,10 @@ import { ArrowLeft, FileText } from 'lucide-react';
 export default function Imprint() {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Imprint" 
+        description="Legal information and medical disclaimers for DentalSecondOpinion service."
+      />
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center gap-4 px-4">
           <Link href="/">
