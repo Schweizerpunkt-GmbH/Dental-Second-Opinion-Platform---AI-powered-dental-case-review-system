@@ -119,7 +119,7 @@ export function SEO({ title, description, image, url }: SEOProps) {
     // Geo targeting for Switzerland
     updateMeta('geo.region', 'CH');
     updateMeta('geo.placename', 'Switzerland');
-  }, [pageTitle, pageDescription, pageImage, canonicalUrl, i18n.language, location, alternateUrls, baseUrl]);
+  }, [pageTitle, pageDescription, pageImage, canonicalUrl, i18n.language, location, baseUrl]);
 
   return null;
 }
