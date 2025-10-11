@@ -41,6 +41,14 @@
 - Payment: 145 55% 45% (Green - financial)
 - Critical Findings: 0 70% 55% (Red - urgent attention)
 
+**Pastel Accent Colors** (for backgrounds, hero sections, feature highlights):
+- Soft Medical Blue: 210 70% 92% (Trust, calmness)
+- Mint Fresh: 160 60% 90% (Clean, healthcare)
+- Lavender Trust: 250 60% 92% (Technology, comfort)
+- Warm Peach: 25 70% 90% (Welcoming, friendly)
+- Soft Lilac: 270 50% 90% (AI/Innovation sections)
+- Pale Sky: 200 60% 92% (Openness, clarity)
+
 ### B. Typography
 
 **Font Stack**:
@@ -135,9 +143,16 @@
 - Closed: green badge
 - Payment statuses: color-coded with icons
 
-### E. Animations
+### E. Animations & Motion
 
-**Use Sparingly**:
+**Marketing/Landing Pages** (Framer Motion):
+- Fade-in on scroll: Subtle reveal animations (opacity 0→1, y: 20→0)
+- Parallax backgrounds: Hero images scroll at 0.5x speed
+- Floating elements: Gentle up/down motion for icons (translateY: -5px to 5px)
+- Stagger children: Sequential fade-in for feature cards (staggerChildren: 0.1)
+- Gradient shifts: Subtle color transitions on hover
+
+**Application Pages** (Clinical):
 - Page transitions: None (instant for clinical efficiency)
 - Modal entry: Fade + subtle scale (duration-200)
 - Upload progress: Smooth width transition (transition-all)
@@ -146,10 +161,9 @@
 - Focus states: Ring expansion (transition-shadow)
 
 **Prohibited**:
-- Decorative animations
 - Auto-playing carousels
-- Complex scroll-triggered effects
-- Page load animations
+- Aggressive/distracting animations
+- Long animation durations (>400ms)
 
 ## Page-Specific Guidelines
 
