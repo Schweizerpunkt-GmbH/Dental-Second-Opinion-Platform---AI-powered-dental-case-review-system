@@ -76,8 +76,8 @@ function Router() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
         <ThemeProvider defaultTheme="light">
           <TooltipProvider>
             <Suspense fallback={
@@ -91,7 +91,7 @@ export default function App() {
             </Suspense>
           </TooltipProvider>
         </ThemeProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </QueryClientProvider>
   );
 }
