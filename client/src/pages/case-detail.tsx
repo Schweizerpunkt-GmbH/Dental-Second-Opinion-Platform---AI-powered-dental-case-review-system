@@ -28,6 +28,22 @@ export default function CaseDetail() {
 
   const paymentMutation = useMutation({
     mutationFn: async (type: "AI" | "REVIEW") => {
+      // Check if user is authenticated
+      const authResponse = await fetch('/api/auth/user');
+      
+      if (!authResponse.ok) {
+        // Not authenticated - store intent and redirect to login
+        sessionStorage.setItem('paymentIntent', JSON.stringify({ caseId: id, type }));
+        window.location.href = '/api/login';
+        return null;
+      }
+
+      // Check if case needs to be claimed (anonymous case)
+      if (caseData?.userId === 'anonymous') {
+        await apiRequest("POST", `/api/cases/${id}/claim`, {});
+        queryClient.invalidateQueries({ queryKey: [`/api/cases/${id}`] });
+      }
+
       const response = await apiRequest("POST", "/api/payments/create-checkout", {
         caseId: id,
         type,
@@ -35,7 +51,7 @@ export default function CaseDetail() {
       return response.json();
     },
     onSuccess: (data) => {
-      if (data.url) {
+      if (data?.url) {
         window.location.href = data.url;
       }
     },

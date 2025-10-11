@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useToast } from '@/hooks/use-toast';
 import {
   Upload,
   Shield,
@@ -16,13 +18,18 @@ import {
   FileText,
   Brain,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { apiRequest } from '@/lib/queryClient';
 
 export default function Landing() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [files, setFiles] = useState<File[]>([]);
+  const [symptoms, setSymptoms] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -30,11 +37,56 @@ export default function Landing() {
     }
   };
 
-  const handleContinue = () => {
-    if (files.length > 0) {
-      // Store files temporarily and navigate to wizard
-      sessionStorage.setItem('uploadedFiles', JSON.stringify(files.map(f => f.name)));
-      setLocation('/upload');
+  const handleContinue = async () => {
+    if (files.length === 0) {
+      toast({
+        title: "No files selected",
+        description: "Please select at least one file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!symptoms.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please describe your symptoms or concerns",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Create anonymous case
+      const response = await fetch('/api/cases/anonymous', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms }),
+      });
+
+      if (!response.ok) throw new Error('Failed to create case');
+      
+      const caseData = await response.json();
+      
+      // Store case ID and file info in session
+      sessionStorage.setItem('anonymousCaseId', caseData.id);
+      sessionStorage.setItem('uploadedFiles', JSON.stringify(files.map(f => ({ 
+        name: f.name,
+        size: f.size,
+        type: f.type
+      }))));
+      
+      // Redirect to payment selection
+      setLocation(`/case/${caseData.id}`);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,7 +140,18 @@ export default function Landing() {
                 </CardTitle>
                 <CardDescription>{t('upload.description')}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Describe your symptoms or concerns</label>
+                  <Textarea
+                    placeholder="e.g., Tooth pain, treatment offer review, second opinion needed..."
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                    className="min-h-24"
+                    data-testid="textarea-symptoms"
+                  />
+                </div>
+
                 <div className="rounded-lg border-2 border-dashed border-primary/30 p-12 text-center transition-colors hover:border-primary/50">
                   <Upload className="mx-auto mb-4 h-12 w-12 text-primary" />
                   <p className="mb-2 text-sm font-medium">{t('upload.dropzone')}</p>
@@ -104,28 +167,35 @@ export default function Landing() {
                   <Button
                     onClick={() => document.getElementById('hero-file-upload')?.click()}
                     size="lg"
+                    variant="outline"
                     data-testid="button-upload-hero"
                     className="hover-elevate active-elevate-2"
                   >
                     <Upload className="mr-2 h-4 w-4" />
-                    {t('hero.cta')}
+                    Select Files
                   </Button>
                   {files.length > 0 && (
                     <div className="mt-4">
                       <p className="text-sm text-muted-foreground">
                         {files.length} file(s) selected
                       </p>
-                      <Button
-                        onClick={handleContinue}
-                        className="mt-3 hover-elevate active-elevate-2"
-                        data-testid="button-continue-hero"
-                      >
-                        {t('upload.continue')}
-                        <ChevronRight className="ml-2 h-4 w-4" />
-                      </Button>
                     </div>
                   )}
                 </div>
+
+                <Button
+                  onClick={handleContinue}
+                  disabled={loading || files.length === 0 || !symptoms.trim()}
+                  size="lg"
+                  className="w-full hover-elevate active-elevate-2"
+                  data-testid="button-continue-hero"
+                >
+                  {loading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating case...</>
+                  ) : (
+                    <><ChevronRight className="mr-2 h-4 w-4" />Continue to Payment</>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </div>

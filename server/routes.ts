@@ -108,7 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/cases/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/cases/:id", async (req: any, res) => {
     try {
       const caseId = req.params.id;
       const [caseData] = await db
@@ -121,8 +121,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Case not found" });
       }
 
-      // Check ownership or admin/dentist access
+      // Allow access to anonymous cases or require auth for owned cases
+      if (caseData.userId !== "anonymous" && !req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Check ownership or admin/dentist access for non-anonymous cases
       if (
+        caseData.userId !== "anonymous" &&
+        req.user &&
         caseData.userId !== req.user.id &&
         req.user.role !== "ADMIN" &&
         req.user.role !== "DENTIST"
@@ -138,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         db.select().from(payments).where(eq(payments.caseId, caseId)),
       ]);
 
-      await logAudit(req.user.id, "VIEW_CASE", { caseId });
+      await logAudit(req.user?.id, "VIEW_CASE", { caseId, anonymous: caseData.userId === "anonymous" });
 
       res.json({
         ...caseData,
@@ -149,6 +156,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Anonymous case creation (no auth required)
+  app.post("/api/cases/anonymous", async (req: any, res) => {
+    try {
+      const validatedData = insertCaseSchema.parse({
+        ...req.body,
+        userId: "anonymous", // Temporary placeholder
+        status: "DRAFT",
+      });
+
+      const [newCase] = await db.insert(cases).values(validatedData).returning();
+      
+      await logAudit(undefined, "CREATE_ANONYMOUS_CASE", { caseId: newCase.id });
+      res.status(201).json(newCase);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
@@ -164,6 +189,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await logAudit(req.user.id, "CREATE_CASE", { caseId: newCase.id });
       res.status(201).json(newCase);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Claim anonymous case after login
+  app.post("/api/cases/:id/claim", isAuthenticated, async (req: any, res) => {
+    try {
+      const caseId = req.params.id;
+      const [existingCase] = await db
+        .select()
+        .from(cases)
+        .where(eq(cases.id, caseId))
+        .limit(1);
+
+      if (!existingCase) {
+        return res.status(404).json({ message: "Case not found" });
+      }
+
+      if (existingCase.userId !== "anonymous") {
+        return res.status(400).json({ message: "Case already claimed" });
+      }
+
+      const [updatedCase] = await db
+        .update(cases)
+        .set({ userId: req.user.id })
+        .where(eq(cases.id, caseId))
+        .returning();
+
+      await logAudit(req.user.id, "CLAIM_CASE", { caseId });
+      res.json(updatedCase);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
