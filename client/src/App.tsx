@@ -18,6 +18,7 @@ import DentistReview from "@/pages/dentist-review";
 import AdminDashboard from "@/pages/admin-dashboard";
 import Privacy from "@/pages/privacy";
 import Imprint from "@/pages/imprint";
+import Disclaimer from "@/pages/disclaimer";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -35,6 +36,7 @@ function Router() {
       {/* Public routes */}
       <Route path="/privacy" component={Privacy} />
       <Route path="/imprint" component={Imprint} />
+      <Route path="/disclaimer" component={Disclaimer} />
       
       {!isAuthenticated ? (
         <>
