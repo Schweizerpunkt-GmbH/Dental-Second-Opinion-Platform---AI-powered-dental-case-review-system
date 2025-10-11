@@ -205,7 +205,7 @@ export default function UploadWizard() {
                     <CardDescription>Instant AI-powered report</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-4 text-3xl font-bold">$29</div>
+                    <div className="mb-4 text-3xl font-bold">9.90 CHF</div>
                     <ul className="mb-4 space-y-2 text-sm">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -241,7 +241,7 @@ export default function UploadWizard() {
                     <CardDescription>AI report + dentist verification</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-4 text-3xl font-bold">$89</div>
+                    <div className="mb-4 text-3xl font-bold">60 CHF</div>
                     <ul className="mb-4 space-y-2 text-sm">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary" />

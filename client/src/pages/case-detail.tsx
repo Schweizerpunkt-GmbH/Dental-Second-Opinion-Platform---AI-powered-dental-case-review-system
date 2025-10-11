@@ -247,7 +247,7 @@ export default function CaseDetail() {
                     {paymentMutation.isPending ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
                     ) : (
-                      <><CreditCard className="mr-2 h-4 w-4" />Request Analysis ($29)</>
+                      <><CreditCard className="mr-2 h-4 w-4" />Request Analysis (9.90 CHF)</>
                     )}
                   </Button>
                 )}
@@ -261,7 +261,7 @@ export default function CaseDetail() {
                     {paymentMutation.isPending ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
                     ) : (
-                      <><UserCheck className="mr-2 h-4 w-4" />Request Dentist Review ($60)</>
+                      <><UserCheck className="mr-2 h-4 w-4" />Request Dentist Review (60 CHF)</>
                     )}
                   </Button>
                 )}

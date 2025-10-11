@@ -211,14 +211,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Case not found" });
       }
 
-      // Determine amount based on type
+      // Determine amount based on type (CHF cents)
       const amounts: Record<string, number> = {
-        AI: 2900, // $29
-        REVIEW: 8900, // $89
+        AI: 990, // 9.90 CHF
+        REVIEW: 6000, // 60 CHF
         LEAD: 0,
       };
 
-      const amount = amounts[type] || 2900;
+      const amount = amounts[type] || 990;
 
       // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({
@@ -226,9 +226,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         line_items: [
           {
             price_data: {
-              currency: "usd",
+              currency: "chf",
               product_data: {
-                name: type === "AI" ? "AI Analysis" : "AI + Expert Review",
+                name: type === "AI" ? "AI Analysis" : "Expert Dentist Review",
                 description: `Dental second opinion for case ${caseId.slice(0, 8)}`,
               },
               unit_amount: amount,
