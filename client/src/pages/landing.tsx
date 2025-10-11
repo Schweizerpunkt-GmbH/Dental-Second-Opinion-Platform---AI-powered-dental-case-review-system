@@ -221,7 +221,15 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {(t('pricing.ai.features', { returnObjects: true }) as string[]).map((feature, i) => (
+                    {(Array.isArray(t('pricing.ai.features', { returnObjects: true })) 
+                      ? t('pricing.ai.features', { returnObjects: true }) as string[]
+                      : [
+                        'Instant AI-powered analysis',
+                        'Detailed findings report',
+                        'Confidence scoring',
+                        'PDF download'
+                      ]
+                    ).map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
                         <span>{feature}</span>
@@ -242,7 +250,15 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {(t('pricing.expert.features', { returnObjects: true }) as string[]).map((feature, i) => (
+                    {(Array.isArray(t('pricing.expert.features', { returnObjects: true })) 
+                      ? t('pricing.expert.features', { returnObjects: true }) as string[]
+                      : [
+                        'Licensed dentist review',
+                        'Detailed clinical notes',
+                        'Treatment recommendations',
+                        'Signed PDF report'
+                      ]
+                    ).map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
                         <span>{feature}</span>
