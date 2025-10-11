@@ -27,6 +27,18 @@
     <priority>0.5</priority>
   </url>
 
+  <!-- Medical Disclaimer -->
+  <url>
+    <loc>https://dentalsecondopinion.ch/disclaimer</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dentalsecondopinion.ch/disclaimer?lang=de" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://dentalsecondopinion.ch/disclaimer?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://dentalsecondopinion.ch/disclaimer?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://dentalsecondopinion.ch/disclaimer?lang=it" />
+    <lastmod>2025-10-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <!-- Imprint -->
   <url>
     <loc>https://dentalsecondopinion.ch/imprint</loc>
