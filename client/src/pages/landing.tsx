@@ -1,226 +1,287 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Shield, Brain, UserCheck, ArrowRight, Sparkles } from "lucide-react";
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/theme-toggle';
+import {
+  Upload,
+  Shield,
+  Zap,
+  DollarSign,
+  UserCheck,
+  CheckCircle2,
+  TrendingDown,
+  FileText,
+  Brain,
+  ChevronRight,
+} from 'lucide-react';
+import { useLocation } from 'wouter';
 
 export default function Landing() {
+  const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const [files, setFiles] = useState<File[]>([]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleContinue = () => {
+    if (files.length > 0) {
+      // Store files temporarily and navigate to wizard
+      sessionStorage.setItem('uploadedFiles', JSON.stringify(files.map(f => f.name)));
+      setLocation('/upload');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+              <FileText className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-semibold">DentalSecondOpinion</span>
+            <span className="text-xl font-bold">DentalSecondOpinion</span>
           </div>
-          <Button 
-            onClick={() => window.location.href = '/api/login'}
-            data-testid="button-login"
-            className="hover-elevate active-elevate-2"
-          >
-            Sign In
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <Button
+              onClick={() => window.location.href = '/api/login'}
+              variant="default"
+              data-testid="button-login"
+              className="hover-elevate active-elevate-2"
+            >
+              {t('nav.login')}
+            </Button>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-background" />
-        <div className="container relative mx-auto px-4 py-24 md:py-32">
-          <div className="mx-auto max-w-3xl text-center">
+      <main>
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-20">
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20" data-testid="badge-trust">
+              <Shield className="mr-1 h-3 w-3" />
+              {t('hero.trustBadge')}
+            </Badge>
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Get a{" "}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Second Opinion
-              </span>
-              {" "}on Your Dental Care
+              {t('hero.title')}
             </h1>
-            <p className="mb-8 text-lg text-muted-foreground md:text-xl">
-              AI-powered analysis combined with expert dentist review. Get accurate, 
-              trustworthy insights on your dental X-rays and treatment plans within hours.
+            <p className="mb-8 text-xl text-muted-foreground">
+              {t('hero.subtitle')}
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Button
-                size="lg"
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-get-started"
-                className="hover-elevate active-elevate-2"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                data-testid="button-learn-more"
-                className="hover-elevate active-elevate-2"
-              >
-                Learn More
-              </Button>
-            </div>
 
-            {/* Trust badges */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-primary" />
-                <span>GDPR Compliant</span>
+            {/* File Upload */}
+            <Card className="mx-auto mb-12 max-w-2xl border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  {t('upload.title')}
+                </CardTitle>
+                <CardDescription>{t('upload.description')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border-2 border-dashed border-primary/30 p-12 text-center transition-colors hover:border-primary/50">
+                  <Upload className="mx-auto mb-4 h-12 w-12 text-primary" />
+                  <p className="mb-2 text-sm font-medium">{t('upload.dropzone')}</p>
+                  <p className="mb-4 text-xs text-muted-foreground">{t('upload.fileTypes')}</p>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".jpg,.jpeg,.png,.dcm,.pdf"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="hero-file-upload"
+                  />
+                  <Button
+                    onClick={() => document.getElementById('hero-file-upload')?.click()}
+                    size="lg"
+                    data-testid="button-upload-hero"
+                    className="hover-elevate active-elevate-2"
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    {t('hero.cta')}
+                  </Button>
+                  {files.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        {files.length} file(s) selected
+                      </p>
+                      <Button
+                        onClick={handleContinue}
+                        className="mt-3 hover-elevate active-elevate-2"
+                        data-testid="button-continue-hero"
+                      >
+                        {t('upload.continue')}
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Metrics Section */}
+        <section className="border-y bg-muted/50 py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid gap-8 sm:grid-cols-3">
+              <div className="text-center">
+                <div className="mb-2 text-4xl font-bold text-primary">{t('metrics.analyses')}</div>
+                <p className="text-sm text-muted-foreground">{t('metrics.analysesLabel')}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span>256-bit Encryption</span>
+              <div className="text-center">
+                <div className="mb-2 text-4xl font-bold text-primary">{t('metrics.patients')}</div>
+                <p className="text-sm text-muted-foreground">{t('metrics.patientsLabel')}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <UserCheck className="h-4 w-4 text-primary" />
-                <span>Licensed Dentists</span>
+              <div className="text-center">
+                <div className="mb-2 text-4xl font-bold text-primary">{t('metrics.savings')}</div>
+                <p className="text-sm text-muted-foreground">{t('metrics.savingsLabel')}</p>
+                <p className="mt-2 font-semibold text-primary">{t('metrics.savingsCta')}</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="border-b py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">How It Works</h2>
-            <p className="text-lg text-muted-foreground">
-              Get professional insights in three simple steps
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
+        {/* Benefits Section */}
+        <section className="container mx-auto px-4 py-20">
+          <h2 className="mb-12 text-center text-3xl font-bold">{t('benefits.title')}</h2>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <Card className="hover-elevate">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <span className="text-2xl font-bold text-primary">1</span>
+                  <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Upload Your Images</CardTitle>
-                <CardDescription>
-                  Securely upload your dental X-rays, OPT, DVT, CBCT scans, or treatment offers
-                </CardDescription>
+                <CardTitle>{t('benefits.neutral.title')}</CardTitle>
               </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{t('benefits.neutral.description')}</p>
+              </CardContent>
             </Card>
 
             <Card className="hover-elevate">
               <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-medical-ai/10">
-                  <Brain className="h-6 w-6 text-medical-ai" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <Zap className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>AI Analysis</CardTitle>
-                <CardDescription>
-                  Our AI analyzes your images and generates a detailed report with findings and confidence scores
-                </CardDescription>
+                <CardTitle>{t('benefits.fast.title')}</CardTitle>
               </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{t('benefits.fast.description')}</p>
+              </CardContent>
             </Card>
 
             <Card className="hover-elevate">
               <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-medical-dentist/10">
-                  <UserCheck className="h-6 w-6 text-medical-dentist" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <DollarSign className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Expert Review</CardTitle>
-                <CardDescription>
-                  Optionally request a licensed dentist to review your case and provide professional insights
-                </CardDescription>
+                <CardTitle>{t('benefits.affordable.title')}</CardTitle>
               </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{t('benefits.affordable.description')}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <UserCheck className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>{t('benefits.expert.title')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{t('benefits.expert.description')}</p>
+              </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features */}
-      <section className="border-b py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Why Choose Us</h2>
-            <p className="text-lg text-muted-foreground">
-              Professional, secure, and affordable second opinions
-            </p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: Brain,
-                title: "AI-Powered Analysis",
-                description: "Advanced machine learning models trained on thousands of dental cases",
-              },
-              {
-                icon: UserCheck,
-                title: "Licensed Professionals",
-                description: "All reviews conducted by verified, experienced dental professionals",
-              },
-              {
-                icon: Shield,
-                title: "GDPR Compliant",
-                description: "Your data is encrypted and stored securely with full privacy compliance",
-              },
-              {
-                icon: CheckCircle2,
-                title: "Fast Results",
-                description: "AI reports within minutes, dentist reviews within 24-48 hours",
-              },
-              {
-                icon: ArrowRight,
-                title: "Find a Dentist",
-                description: "Get matched with partner practices in your area for treatment",
-              },
-              {
-                icon: Sparkles,
-                title: "Transparent Pricing",
-                description: "Clear, upfront pricing for AI analysis and professional reviews",
-              },
-            ].map((feature, i) => (
-              <Card key={i} className="hover-elevate">
+        {/* Pricing Section */}
+        <section className="border-t bg-muted/50 py-20">
+          <div className="container mx-auto px-4">
+            <h2 className="mb-12 text-center text-3xl font-bold">{t('pricing.title')}</h2>
+            <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+              <Card className="border-primary/50 hover-elevate">
                 <CardHeader>
-                  <feature.icon className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-primary" />
+                    <CardTitle>{t('pricing.ai.name')}</CardTitle>
+                  </div>
+                  <div className="text-3xl font-bold text-primary">{t('pricing.ai.price')}</div>
                 </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {(t('pricing.ai.features', { returnObjects: true }) as string[]).map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardContent className="p-12 text-center">
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-                Ready to Get Your Second Opinion?
-              </h2>
-              <p className="mb-8 text-lg text-muted-foreground">
-                Join thousands of patients who trust us for their dental care decisions
+              <Card className="border-primary hover-elevate">
+                <CardHeader>
+                  <div className="mb-2 flex items-center gap-2">
+                    <UserCheck className="h-5 w-5 text-primary" />
+                    <CardTitle>{t('pricing.expert.name')}</CardTitle>
+                    <Badge className="bg-primary">Popular</Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-primary">{t('pricing.expert.price')}</div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {(t('pricing.expert.features', { returnObjects: true }) as string[]).map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="container mx-auto px-4 py-20">
+          <Card className="border-primary/50 bg-primary/5">
+            <CardContent className="flex flex-col items-center justify-center gap-6 py-12 text-center">
+              <TrendingDown className="h-16 w-16 text-primary" />
+              <h3 className="text-2xl font-bold">Start Saving Today!</h3>
+              <p className="max-w-2xl text-muted-foreground">
+                Join thousands of patients who have saved money on dental treatments with our independent second opinion service.
               </p>
               <Button
+                onClick={() => document.getElementById('hero-file-upload')?.click()}
                 size="lg"
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-cta-start"
+                data-testid="button-cta-bottom"
                 className="hover-elevate active-elevate-2"
               >
-                Start Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <Upload className="mr-2 h-5 w-5" />
+                {t('hero.cta')}
               </Button>
             </CardContent>
           </Card>
-        </div>
-      </section>
+        </section>
+      </main>
 
       {/* Footer */}
       <footer className="border-t py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © 2024 DentalSecondOpinion. All rights reserved.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Medical Disclaimer: This service is for informational purposes only and does not replace professional dental examination.
-            </p>
-          </div>
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>© 2025 DentalSecondOpinion. All rights reserved.</p>
         </div>
       </footer>
     </div>
