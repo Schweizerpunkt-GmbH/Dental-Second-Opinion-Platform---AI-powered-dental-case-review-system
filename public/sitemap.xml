@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Landing Page - DE (primary) -->
+  <url>
+    <loc>https://dentalsecondopinion.ch/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dentalsecondopinion.ch/?lang=de" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://dentalsecondopinion.ch/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://dentalsecondopinion.ch/?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://dentalsecondopinion.ch/?lang=it" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dentalsecondopinion.ch/" />
+    <lastmod>2025-10-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://dentalsecondopinion.ch/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dentalsecondopinion.ch/privacy?lang=de" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://dentalsecondopinion.ch/privacy?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://dentalsecondopinion.ch/privacy?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://dentalsecondopinion.ch/privacy?lang=it" />
+    <lastmod>2025-10-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Imprint -->
+  <url>
+    <loc>https://dentalsecondopinion.ch/imprint</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dentalsecondopinion.ch/imprint?lang=de" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://dentalsecondopinion.ch/imprint?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://dentalsecondopinion.ch/imprint?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://dentalsecondopinion.ch/imprint?lang=it" />
+    <lastmod>2025-10-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
