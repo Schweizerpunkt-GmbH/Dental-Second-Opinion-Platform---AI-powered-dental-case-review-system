@@ -170,22 +170,27 @@ export function StructuredData({ type = 'organization' }: StructuredDataProps) {
     ]
   };
 
-  let schema;
+  let schemas;
   switch (type) {
     case 'service':
-      schema = [organizationSchema, serviceSchema, faqSchema];
+      schemas = [organizationSchema, serviceSchema, faqSchema];
       break;
     case 'medical':
-      schema = [organizationSchema, medicalWebsiteSchema, breadcrumbSchema];
+      schemas = [organizationSchema, medicalWebsiteSchema, breadcrumbSchema];
       break;
     default:
-      schema = [organizationSchema, serviceSchema, medicalWebsiteSchema, faqSchema];
+      schemas = [organizationSchema, serviceSchema, medicalWebsiteSchema, faqSchema];
   }
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      {schemas.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+    </>
   );
 }

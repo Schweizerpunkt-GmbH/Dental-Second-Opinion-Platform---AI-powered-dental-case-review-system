@@ -89,7 +89,49 @@ async function processAIAnalysis(caseId: string) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Replit Auth
   await setupAuth(app);
-  
+
+  // ============= LOCAL DEV AUTH BYPASS =============
+  // For local development, allow logging in as test users
+  if (process.env.NODE_ENV === 'development') {
+    app.post("/api/dev-login", async (req: any, res) => {
+      try {
+        const { userId } = req.body;
+
+        if (!userId) {
+          return res.status(400).json({ message: "userId required" });
+        }
+
+        const [user] = await db.select().from(users).where(eq(users.id, userId));
+
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // Create a session for this user
+        req.session.passport = { user: { claims: { sub: userId } } };
+        await new Promise((resolve, reject) => {
+          req.session.save((err: any) => {
+            if (err) reject(err);
+            else resolve(undefined);
+          });
+        });
+
+        res.json({ success: true, user });
+      } catch (error: any) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+
+    app.get("/api/dev-users", async (req: any, res) => {
+      try {
+        const allUsers = await db.select().from(users);
+        res.json(allUsers);
+      } catch (error: any) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+  }
+
   // ============= AUTH ROUTES =============
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     res.json(req.user);
@@ -172,11 +214,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const [newCase] = await db.insert(cases).values(validatedData).returning();
-      
+
       await logAudit(undefined, "CREATE_ANONYMOUS_CASE", { caseId: newCase.id });
       res.status(201).json(newCase);
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error("Anonymous case creation error:", error);
+      res.status(400).json({ message: error.message || "Failed to create case" });
     }
   });
 

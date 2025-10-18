@@ -131,7 +131,14 @@ export default function Landing() {
         description={t('hero.subtitle')}
       />
       <StructuredData type="service" />
-      
+
+      {/* Development Mode Banner */}
+      {import.meta.env.DEV && (
+        <div className="bg-yellow-500 text-yellow-950 px-4 py-2 text-center text-sm font-medium">
+          🔧 Development Mode - Click "Login" to access the dev login page
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -145,7 +152,7 @@ export default function Landing() {
             <LanguageSwitcher />
             <ThemeToggle />
             <Button
-              onClick={() => window.location.href = '/api/login'}
+              onClick={() => window.location.href = import.meta.env.DEV ? '/dev-login' : '/api/login'}
               variant="default"
               data-testid="button-login"
               className="hover-elevate active-elevate-2"

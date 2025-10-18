@@ -144,7 +144,17 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  // For local development, check for dev session
+  if (process.env.NODE_ENV === 'development' && req.session?.passport?.user?.claims?.sub) {
+    const userId = req.session.passport.user.claims.sub;
+    const [dbUser] = await db.select().from(users).where(eq(users.id, userId));
+    if (dbUser) {
+      (req as any).user = dbUser;
+      return next();
+    }
+  }
+
+  if (!req.isAuthenticated() || !user?.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

@@ -19,6 +19,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import Privacy from "@/pages/privacy";
 import Imprint from "@/pages/imprint";
 import Disclaimer from "@/pages/disclaimer";
+import DevLogin from "@/pages/dev-login";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -37,7 +38,8 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/imprint" component={Imprint} />
       <Route path="/disclaimer" component={Disclaimer} />
-      
+      {import.meta.env.DEV && <Route path="/dev-login" component={DevLogin} />}
+
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Landing} />
